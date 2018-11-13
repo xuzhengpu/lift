@@ -18,12 +18,24 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ElevatorLift.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Passenger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="lift.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ElevatorLift.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Passenger.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
