@@ -3,6 +3,7 @@ class Time
 {
 	
     public:
+	bool onoff;   //决定时间是否有效
 	unsigned int hour;
 	unsigned int minute;
 	unsigned int second;

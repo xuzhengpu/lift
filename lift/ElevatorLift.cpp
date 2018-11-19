@@ -15,7 +15,7 @@ void ElevatorLift::action()
 {
 	UpdateNowFloor();       // 更新当前电梯所在楼层
 	UpdateDestination();    // 更新电梯下一站的目的楼层
-	ChangeStatus();         // 判断当前电梯状态
+	ChangeStatus();         // 判断改变当前电梯状态
 	Run();                  // 电梯运行
 }
 
@@ -31,7 +31,7 @@ void ElevatorLift::UpdateNowFloor()
 
 		//举例 elevation =4.1   high=2   fmod(elevation,hight） =0.1< 0.2 
 		   //(int)elevation/hight=2 则电梯目前底部靠近三楼
-		NowFloor = (int)elevation / hight + 1; //电梯所处楼层位置=电梯高度除以楼层高度再加一
+		NowFloor = (int)(elevation / hight) + 1; //电梯所处楼层位置=电梯高度除以楼层高度再加一
 	}
 	//如果电梯底部与楼层平面的距离大于楼层高度的80%，则说明电梯马上要到达更高一层，  对应电梯上行
 	if (ans >= 0.8)
@@ -40,7 +40,7 @@ void ElevatorLift::UpdateNowFloor()
 		 举例说明：elevation=9.9， high=2 fmod(elevation,hight）=1.9>1.8
 		 (int)elevation/hight=5 则电梯目前底部靠近六楼
 		*/
-		NowFloor = (int)elevation / hight + 2;
+		NowFloor = (int)(elevation / hight) + 2;
 	}
 }
 
@@ -58,20 +58,31 @@ void ElevatorLift::ChangeStatus()
 			{
 				Down[NowFloor] = false;   //清除记录
 			}
-
-			SYSTEMTIME NowTime;
-			GetLocalTime(&NowTime);
-			Time nowtime(NowTime.wHour,NowTime.wMinute,NowTime.wSecond);
-			NextStart=nowtime +  StopTime;
+			if (!IsTake())
+			{
+				NextFloor = 0;      //电梯停下来以后如没人乘坐电梯，目标楼层置为0  关闭下次启动时间
+				NextStart.onoff = false;
+			}
+			if(NextStart.onoff = true)
+			{
+				SYSTEMTIME NowTime;
+				GetLocalTime(&NowTime);
+				Time nowtime(NowTime.wHour,NowTime.wMinute,NowTime.wSecond);
+				NextStart=nowtime +  StopTime;
+			}
+			
 
 		}
 	}
 	else                //如果为暂停状态，则看是否需要去重新启动
 	{
-		
-		if (IsTake())         //暂停状态下，当前楼层等于目标楼层，则不改变状态
+		 //如果目标楼层为0，则说明没人乘坐电梯，不启动
+		//如果目标楼层不为0 ，则启动电梯
+		if (NextFloor!=0)        
 		{
-			SYSTEMTIME NowTime;
+			if (NextStart.onoff == true)     // 如果电梯的目标时间打开
+			{
+				SYSTEMTIME NowTime;
 			GetLocalTime(&NowTime);
 
 			if (NextStart.hour == NowTime.wHour&&NextStart.minute == NowTime.wMinute&&NextStart.second == NowTime.wSecond)
@@ -80,6 +91,20 @@ void ElevatorLift::ChangeStatus()
 				status = oldstatus;
 				oldstatus = STOP;
 				UpdateDestination();  //取得下一次停靠的楼层
+			}
+			}
+			else
+			{
+				if (NextFloor - NowFloor > 0)
+				{
+					status = UP;
+					NextStart.onoff == true;
+				}
+				else
+				{
+					status = DOWN;
+					NextStart.onoff == true;
+				}
 			}
 		}
 	     //如果电梯记录没有人乘坐，则不改变暂停状态
@@ -132,9 +157,10 @@ void ElevatorLift::UpdateDestination()
 	}
 	else                    //如果电梯暂停，则在上下记录都查询
 	{
-		if (IsUp() == false && IsDown() == false)    //上行空，下行空
+		if (!IsTake())    //如果没人乘坐电梯，则目标楼层置为0  并关闭下次开启时间
 		{
-			NextFloor = NowFloor;
+			NextFloor = 0;
+			NextStart.onoff = false;
 		}
 		if (IsUp() == false && IsDown() == true)    //上行空，下行非空
 		{
@@ -143,18 +169,20 @@ void ElevatorLift::UpdateDestination()
 				if (Down[i] == true)
 				{
 					NextFloor = i;
+					NextStart.onoff = false;    //关闭下次启动时间时间
 					break;
 				}
 			}
 
 		}
-		if (IsUp() == true && IsDown() == false)    //上行非空，下行空
+		if(IsUp() == true && IsDown() == false)    //上行非空，下行空
 		{
 			for (int i = 1; i < Max; i++)   
 			{
 				if (Up[i] == true)
 				{
 					NextFloor = i;
+					NextStart.onoff = false;
 					break;
 				}
 			}
