@@ -44,6 +44,15 @@ Time Time::operator+ (unsigned int sec)
 	return time;
 }
 
+long Time::operator-(Time & sub)
+{ 
+	long a;   //瓜受方
+	long b;   //受方
+	a = this->hour * 3600 + this->minute * 60 + this->second;
+	b = sub.hour * 3600 + sub.minute * 60 + sub.second;
+	return a - b;
+}
+
 
 
 

@@ -26,8 +26,10 @@ class ElevatorLift
 				};
 		Status status;
 		Status oldstatus;
-		bool  Up[100];                 //电梯上行时的停留楼层记录
-		bool  Down[100];               //电梯下行时的停留楼层记录
+		bool  Up[41];                 //电梯上行时的停留楼层记录
+		bool  Down[41];               //电梯下行时的停留楼层记录
+		unsigned  int  InsideUp[41];
+		unsigned  int  InsideDown[41];
 		unsigned  int   NextFloor;    //电梯下一次需要停留的楼层
 		unsigned  int   NowFloor;     //当前电梯所在楼层
 		unsigned  int  speed;         //电梯当前运行的速度
@@ -35,6 +37,6 @@ class ElevatorLift
 		double  hight;                //电梯所在大楼的楼层高度
 		Time NextStart;               //电梯停靠以后下一次的启动时间
 		unsigned int StopTime;        //电梯停靠的时间
-		
+		friend class Passenger;       //将自身数据提供给乘客
 };
 
