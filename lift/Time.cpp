@@ -20,8 +20,9 @@ Time::Time(unsigned int hour, unsigned int minute, unsigned int second)
 
 Time Time::operator+ (unsigned int sec)
 {
+	Time time;
 	if (sec < 0)
-		return;
+		return time;
 	this->second = this->second + sec;
 	if (this->second >= 60)
 	{
@@ -37,7 +38,6 @@ Time Time::operator+ (unsigned int sec)
 			}
 		}
 	}
-	Time time;
 	time.hour = this->hour;
 	time.minute = this->minute ;
 	time.second=this->second;

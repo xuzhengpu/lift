@@ -2,12 +2,7 @@
 #include <Windows.h>
 #include "Time.h"
 constexpr auto Max = 41;;    //楼层数目
-enum Status
-{
-	STOP, // 暂停  
-	UP,   // 向上运行
-	DOWN  // 向下运行
-};
+
 class ElevatorLift
 {
     public:
@@ -23,6 +18,12 @@ class ElevatorLift
 	bool IsUp();
 	bool IsDown();
     private:
+		enum Status
+				{
+					STOP, // 暂停  
+					UP,   // 向上运行
+					DOWN  // 向下运行
+				};
 		Status status;
 		Status oldstatus;
 		bool  Up[100];                 //电梯上行时的停留楼层记录
@@ -34,6 +35,6 @@ class ElevatorLift
 		double  hight;                //电梯所在大楼的楼层高度
 		Time NextStart;               //电梯停靠以后下一次的启动时间
 		unsigned int StopTime;        //电梯停靠的时间
-
+		
 };
 
