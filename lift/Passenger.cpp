@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Passenger.h"
 
-
 Passenger::Passenger()
 {
 }
@@ -24,26 +23,27 @@ void Passenger::action()
 			//如果选定的电梯楼层与乘客所在楼层一致
 			status = TAKE;
 			//统计等待
-			SYSTEMTIME NowTime;
-			GetLocalTime(&NowTime);
-			Time nowtime(NowTime.wHour, NowTime.wMinute, NowTime.wSecond);
-			Total = Total + (nowtime - NextTime);
+			
+			Total = Total + (*nowtime - NextTime);
 			//设定乘坐电梯的目标楼层
 			if ((NextFloor - NowFloor) > 0)
 			{
 				e[which]->InsideUp[NextFloor]++;
 			}
-			else
+			else if((NextFloor - NowFloor) < 0)
 			{
 				e[which]->InsideDown[NextFloor]++;
 			}
-			
+			else
+			{
+
+			}
 		}
 		break;
 	case  TAKE:
-		//更新当前乘坐电梯的楼层                               
+		NowFloor = e[which]->NowFloor;        //更新当前乘坐电梯的楼层                               
 	   //当前状态为乘坐，则查看是否到达目的楼层 ，将状态置为 “离开”或“停止”
-		if (GetNowFloor() == NextFloor)
+		if (NowFloor == NextFloor)
 		{
 			times--;
 			switch (times)
@@ -54,9 +54,11 @@ void Passenger::action()
 			case 1:
 				status = LEAVE;
 				NextFloor = 1;
+				NextTime = (*nowtime + 10);
 				break;
 			default:
 				status = LEAVE;
+				srand((int)time(0));
 				//设定新的目标楼层
 				int temp = ((rand() % 40) + 1);
 				while (temp == NowFloor)    //如果取出的数是当前楼层，则重新取随机数，直到不同
@@ -64,6 +66,7 @@ void Passenger::action()
 					temp = ((rand() % 40) + 1);
 				}
 				NextFloor = temp;
+				NextTime = (*nowtime + 15);                           //生成下一次乘梯时间
 				break;
 			}
 
@@ -72,22 +75,25 @@ void Passenger::action()
 		break;
 	case LEAVE:
 		//当前状态为离开，则查看是否到下次开始乘梯的时间 ，将状态置为 “等待”
-		SYSTEMTIME NowTime;
-		GetLocalTime(&NowTime);
-		if (NowTime.wSecond == NextTime.second && NowTime.wMinute == NextTime.minute &&NowTime.wHour == NextTime.hour)
+		
+		if (nowtime->second == NextTime.second && nowtime->minute == NextTime.minute &&nowtime->hour == NextTime.hour)
 		{
 			//改变状态
 			status = WAIT;
-			//选择乘坐的电梯
-			which = Select();
+			//选择乘坐的电梯组
+			which = 0;
 			//设置电梯停靠楼层
-			if ((NextFloor - NowFloor) > 0)
+			if ((e[which]->NowFloor - NowFloor) < 0)
 			{
-				e[which]->Up[which] = true;
+				e[which]->Up[this->NowFloor] += 1;
+			}
+			else if ((e[which]->NowFloor - NowFloor) > 0)
+			{
+				e[which]->Down[this->NowFloor] += 1;
 			}
 			else
 			{
-				e[which]->Down[which] = true;
+
 			}
 		}
 		break;
@@ -171,5 +177,26 @@ unsigned int Passenger::Select()
 		}
 	}
 	return min;
+}
+
+char * Passenger::GetStatus()
+{
+	switch (status)
+	{
+
+	case  WAIT:
+		strcpy_s(str, "等待");
+		break;
+	case  TAKE:
+		strcpy_s(str, "乘坐");
+		break;
+	case LEAVE:
+		strcpy_s(str, "离开");
+		break;
+	case OVER:
+		strcpy_s(str, "结束");
+		break;
+	}
+	return str;
 }
 

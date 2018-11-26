@@ -9,7 +9,7 @@ Time::Time()
 	this->second = 0;
 }
 
-Time::Time(unsigned int hour, unsigned int minute, unsigned int second)
+Time::Time(int hour,  int minute,  int second)
 {
 	this->hour = hour;
 	this->minute = minute;
@@ -18,29 +18,30 @@ Time::Time(unsigned int hour, unsigned int minute, unsigned int second)
 
 
 
-Time Time::operator+ (unsigned int sec)
+Time Time::operator+ ( int sec)
 {
 	Time time;
-	if (sec < 0)
-		return time;
-	this->second = this->second + sec;
-	if (this->second >= 60)
-	{
-		this->minute = this->minute + this->second / 60;
-		this->second = this->second % 60;
-		if (this ->minute >= 60)
-		{
-			this->hour = this->hour + this->minute / 60;
-			this->minute = this->minute % 60;
-			if (this->hour >= 24)
-			{
-				this->hour = this->hour - 24;
-			}
-		}
-	}
 	time.hour = this->hour;
 	time.minute = this->minute ;
 	time.second=this->second;
+	if (sec < 0)
+		return time;
+	time.second = time.second + sec;
+	if (time.second >= 60)
+	{
+		time.minute = time.minute + time.second / 60;
+		time.second = time.second % 60;
+		if (time.minute >= 60)
+		{
+			time.hour = time.hour + time.minute / 60;
+			time.minute = time.minute % 60;
+			if (time.hour >= 24)
+			{
+				time.hour = time.hour - 24;
+			}
+		}
+	}
+	
 	return time;
 }
 
@@ -52,6 +53,14 @@ long Time::operator-(Time & sub)
 	b = sub.hour * 3600 + sub.minute * 60 + sub.second;
 	return a - b;
 }
+
+void Time::set( int hour,  int minute, int second)
+{
+	this->hour = hour;
+	this->minute = minute;
+	this->second = second;
+}
+
 
 
 
