@@ -11,7 +11,7 @@ class Passenger
 	Passenger();
 	Passenger( int M, int L,ElevatorLift *E[],Time *tm )        //构造函数
 	{
-		srand((int)time(0));
+		
 		NextFloor= (rand() % (40 - 1)) + 1 + 1;  //随机生成目标楼层
 		status=LEAVE;                            //状态为离开状态
 		NowFloor = 1;                            //初始楼层为1

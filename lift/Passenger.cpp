@@ -21,22 +21,30 @@ void Passenger::action()
 		if (e[which]->NowFloor == NowFloor)
 		{
 			//如果选定的电梯楼层与乘客所在楼层一致
-			status = TAKE;
-			//统计等待
-			
-			Total = Total + (*nowtime - NextTime);
-			//设定乘坐电梯的目标楼层
-			if ((NextFloor - NowFloor) > 0)
+			if (((NextFloor - NowFloor) > 0 && (e[which]->NextFloor - e[which]->NowFloor) >= 0) ||
+				((NextFloor - NowFloor) < 0 && (e[which]->NextFloor - e[which]->NowFloor) <= 0))
 			{
-				e[which]->InsideUp[NextFloor]++;
-			}
-			else if((NextFloor - NowFloor) < 0)
-			{
-				e[which]->InsideDown[NextFloor]++;
-			}
-			else
-			{
+				//并且方向一致
 
+				status = TAKE;
+				//统计等待
+
+				Total = Total + (*nowtime - NextTime);
+				//设定乘坐电梯的目标楼层
+				if ((NextFloor - NowFloor) > 0)
+				{
+					e[which]->InsideUp[NextFloor]++;   //设置目标楼层
+					e[which]->Up[this->NowFloor]--;    //撤销呼叫
+				}
+				else if ((NextFloor - NowFloor) < 0)
+				{
+					e[which]->InsideDown[NextFloor]++;   //设置目标楼层
+					e[which]->Down[this->NowFloor]--;    //撤销呼叫
+				}
+				else
+				{
+
+				}
 			}
 		}
 		break;
@@ -83,17 +91,13 @@ void Passenger::action()
 			//选择乘坐的电梯组
 			which = 0;
 			//设置电梯停靠楼层
-			if ((e[which]->NowFloor - NowFloor) < 0)
+			if ((NextFloor - NowFloor) > 0)
 			{
 				e[which]->Up[this->NowFloor] += 1;
 			}
-			else if ((e[which]->NowFloor - NowFloor) > 0)
-			{
-				e[which]->Down[this->NowFloor] += 1;
-			}
 			else
 			{
-
+				e[which]->Down[this->NowFloor] += 1;
 			}
 		}
 		break;

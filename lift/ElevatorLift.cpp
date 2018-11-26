@@ -90,7 +90,7 @@ void ElevatorLift::UpdateDestination()
 	case UPSTOP:
 		for (int i = NowFloor ; i < Max; i++)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
 		{
-			if (Up[i] || InsideUp[i])
+			if (Up[i]||InsideUp[i]||Down[i])
 			{
 				NextFloor = i;
 				break;
@@ -110,7 +110,7 @@ void ElevatorLift::UpdateDestination()
 	case DOWNSTOP:
 		for (int i = NowFloor ; i > 0; i--)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
 		{
-			if (Down[i] || InsideDown[i])
+			if (Down[i] || InsideDown[i]||Up[i])
 			{
 				NextFloor = i;
 				break;
@@ -162,8 +162,7 @@ void ElevatorLift::ChangeStatus()
 		if (NextFloor == NowFloor)     //如果到达停靠楼层
 		{
 			status=UPSTOP;
-			NextStart = (*nowtime + (Up[NowFloor] + InsideUp[NowFloor])*StopTime);  //计算停留时间
-			Up[NowFloor] = 0;
+			NextStart = (*nowtime + (1+Up[NowFloor] + InsideUp[NowFloor])*StopTime);  //计算停留时间
 			InsideUp[NowFloor] = 0;                                               //乘客上下电梯
 
 		}
@@ -187,8 +186,7 @@ void ElevatorLift::ChangeStatus()
 		if (NextFloor == NowFloor)     //如果到达停靠楼层
 		{
 			status = DOWNSTOP;
-			NextStart = (*nowtime + (Down[NowFloor] + InsideDown[NowFloor])*StopTime);  //计算停留时间
-			Down[NowFloor] = 0;
+			NextStart = (*nowtime + (1+Down[NowFloor] + InsideDown[NowFloor])*StopTime);  //计算停留时间
 			InsideDown[NowFloor] = 0;
 		}
 		break;
@@ -196,15 +194,15 @@ void ElevatorLift::ChangeStatus()
 		
 		if (NextStart.hour == nowtime->hour&&NextStart.minute == nowtime->minute&&NextStart.second == nowtime->second)
 		{
-			if (NextFloor < NowFloor)
-			{
-				status = DOWN;
-			}
-			else
+			if (NextFloor >= NowFloor)
 			{
 				status = STOP;
 				busy += (*nowtime - Start);
 				Over = *nowtime;
+			}
+			else 
+			{
+				status = DOWN;
 			}
 		}
 		break;
@@ -235,7 +233,7 @@ void ElevatorLift::Run()
 		int temp = 0;
 		for (int i = NowFloor; i >0; i--)
 		{
-			temp += InsideUp[i];
+			temp += InsideDown[i];
 		}//统计人数
 		people = temp;
 	}
@@ -254,7 +252,7 @@ void ElevatorLift::Run()
 		int temp = 0;
 		for (int i = NowFloor; i > 0; i--)
 		{
-			temp += InsideUp[i];
+			temp += InsideDown[i];
 		}//统计人数
 		people = temp;
 	}
