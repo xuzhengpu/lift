@@ -66,7 +66,6 @@ void Passenger::action()
 				break;
 			default:
 				status = LEAVE;
-				srand((int)time(0));
 				//设定新的目标楼层
 				int temp = ((rand() % 40) + 1);
 				while (temp == NowFloor)    //如果取出的数是当前楼层，则重新取随机数，直到不同
