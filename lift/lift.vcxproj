@@ -152,12 +152,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ElevatorLift.h" />
+    <ClInclude Include="Group.h" />
     <ClInclude Include="Passenger.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Time.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ElevatorLift.cpp" />
+    <ClCompile Include="Group.cpp" />
     <ClCompile Include="lift.cpp" />
     <ClCompile Include="Passenger.cpp" />
     <ClCompile Include="pch.cpp">

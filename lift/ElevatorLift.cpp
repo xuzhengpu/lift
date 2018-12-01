@@ -1,22 +1,25 @@
 #include "pch.h"
+
 #include "ElevatorLift.h"
 #include <math.h>
 #include <time.h>
-ElevatorLift::ElevatorLift( int S, int K, int T,Time *tm)
+ElevatorLift::ElevatorLift()
+{
+}
+ElevatorLift::ElevatorLift(int S, int K, int T, Time *tm)
 {
 	status = STOP;                       //初始电梯停止
-	srand((int)time(0));
 	NowFloor = (rand() % (40 - 1)) + 1;  // 随机生成电梯停靠位置 
 	NextFloor = NowFloor;                //电梯停止时目标楼层与当前楼层一致
 	nowfloor = NowFloor;                 //用于计算的位置
-	speed = 1/(float)S;                         //设置速度  s的单位为秒/层   speed 单位为 层/秒
+	speed = 1 / (float)S;                  //设置速度  s的单位为秒/层   speed 单位为 层/秒
 	StopTime = T;                        // 每个乘客上下电梯的时间  
 	capacity = K;                        //电梯的容量
 	people = 0;                          //当前电梯的人数
-	vacant=0;                            //电梯空闲时间
-	busy=0;                              //电梯运行时间
-	nowtime=tm;
-	Over=*nowtime;
+	vacant = 0;                            //电梯空闲时间
+	busy = 0;                              //电梯运行时间
+	nowtime = tm;
+	Over = *nowtime;
 	//初始化
 	for (int i = 0; i < 41; i++)
 	{
@@ -26,7 +29,7 @@ ElevatorLift::ElevatorLift( int S, int K, int T,Time *tm)
 		InsideUp[i] = 0;
 		InsideDown[i] = 0;
 	}
-	
+
 }
 
 
@@ -44,7 +47,7 @@ void ElevatorLift::action()
 
 char * ElevatorLift::GetStatus()
 {
-	
+
 	switch (status)
 	{
 	case UP:
@@ -68,6 +71,54 @@ char * ElevatorLift::GetStatus()
 	return str;
 }
 
+int ElevatorLift::GetNextFloor()
+{
+	return NextFloor;
+}
+
+int ElevatorLift::GetNowFloor()
+{
+	return NowFloor;
+}
+
+int ElevatorLift::Getpeople()
+{
+	return people;
+}
+
+int ElevatorLift::Getbusy()
+{
+	return busy;
+}
+
+int ElevatorLift::Getvacant()
+{
+	return vacant;
+}
+
+void ElevatorLift::SetUp(int floor, int n)
+{
+	Up[floor] += n;
+}
+
+void ElevatorLift::SetDown(int floor, int n)
+{
+	Down[floor] += n;
+}
+
+void ElevatorLift::SetInsideUp(int floor, int n)
+{
+	InsideUp[floor] += n;
+}
+
+void ElevatorLift::SetInsideDown(int floor, int n)
+{
+	InsideDown[floor] += n;
+}
+
+
+
+
 
 void ElevatorLift::UpdateNowFloor()
 {
@@ -78,7 +129,7 @@ void ElevatorLift::UpdateDestination()
 	switch (status)
 	{
 	case UP:
-		for (int i = NowFloor ; i < Max; i++)   //从当前楼层上一层开始查询，如果有停靠记录，取最近的楼层为目标楼层
+		for (int i = NowFloor; i < Max; i++)   //从当前楼层上一层开始查询，如果有停靠记录，取最近的楼层为目标楼层
 		{
 			if (Up[i] || InsideUp[i])
 			{
@@ -86,11 +137,11 @@ void ElevatorLift::UpdateDestination()
 				break;
 			}
 		}
-			break;
+		break;
 	case UPSTOP:
-		for (int i = NowFloor ; i < Max; i++)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
+		for (int i = NowFloor; i < Max; i++)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
 		{
-			if (Up[i]||InsideUp[i]||Down[i])
+			if (Up[i] || InsideUp[i] || Down[i])
 			{
 				NextFloor = i;
 				break;
@@ -98,7 +149,7 @@ void ElevatorLift::UpdateDestination()
 		}
 		break;
 	case DOWN:
-		for (int i = NowFloor ; i > 0; i--)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
+		for (int i = NowFloor; i > 0; i--)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
 		{
 			if (Down[i] || InsideDown[i])
 			{
@@ -108,9 +159,9 @@ void ElevatorLift::UpdateDestination()
 		}
 		break;
 	case DOWNSTOP:
-		for (int i = NowFloor ; i > 0; i--)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
+		for (int i = NowFloor; i > 0; i--)   //从当前楼层开始查询，如果有停靠记录，取最近的楼层为目标楼层
 		{
-			if (Down[i] || InsideDown[i]||Up[i])
+			if (Down[i] || InsideDown[i] || Up[i])
 			{
 				NextFloor = i;
 				break;
@@ -118,22 +169,22 @@ void ElevatorLift::UpdateDestination()
 		}
 		break;
 	case STOP:
-		
-		
+
+
 		if (IsTake())                   //如果电梯停下来，以后还有目标楼层
 		{
 			NextFloor = IsTake();
 		}
-		else 
+		else
 		{                                //没人乘坐的话，查询呼叫
 			if (call())                  //如果有人呼叫电梯
-			NextFloor = call();
+				NextFloor = call();
 		}
-        break;
+		break;
 	default:
 		break;
-    }
-		
+	}
+
 }
 
 void ElevatorLift::ChangeStatus()
@@ -141,10 +192,10 @@ void ElevatorLift::ChangeStatus()
 	switch (status)
 	{
 	case STOP:                         //状态为停止，则检查是否改变状态到“上”或“下”
-		
-		if (NextFloor != NowFloor )    //如果发现目标楼层与当前楼层不一致，则需要启动电梯
+
+		if (NextFloor != NowFloor)    //如果发现目标楼层与当前楼层不一致，则需要启动电梯
 		{
-			if(NextFloor - NowFloor > 0)
+			if (NextFloor - NowFloor > 0)
 			{
 				status = UP;
 				vacant += (*nowtime - Over);
@@ -161,8 +212,8 @@ void ElevatorLift::ChangeStatus()
 	case UP:          //状态为向上运行，则检查是否改变状态到“上停”
 		if (NextFloor == NowFloor)     //如果到达停靠楼层
 		{
-			status=UPSTOP;
-			NextStart = (*nowtime + (1+Up[NowFloor] + InsideUp[NowFloor])*StopTime);  //计算停留时间
+			status = UPSTOP;
+			NextStart = (*nowtime + (1 + Up[NowFloor] + InsideUp[NowFloor])*StopTime);  //计算停留时间
 			InsideUp[NowFloor] = 0;                                               //乘客上下电梯
 
 		}
@@ -186,12 +237,12 @@ void ElevatorLift::ChangeStatus()
 		if (NextFloor == NowFloor)     //如果到达停靠楼层
 		{
 			status = DOWNSTOP;
-			NextStart = (*nowtime + (1+Down[NowFloor] + InsideDown[NowFloor])*StopTime);  //计算停留时间
+			NextStart = (*nowtime + (1 + Down[NowFloor] + InsideDown[NowFloor])*StopTime);  //计算停留时间
 			InsideDown[NowFloor] = 0;
 		}
 		break;
 	case DOWNSTOP:
-		
+
 		if (NextStart.hour == nowtime->hour&&NextStart.minute == nowtime->minute&&NextStart.second == nowtime->second)
 		{
 			if (NextFloor >= NowFloor)
@@ -200,7 +251,7 @@ void ElevatorLift::ChangeStatus()
 				busy += (*nowtime - Start);
 				Over = *nowtime;
 			}
-			else 
+			else
 			{
 				status = DOWN;
 			}
@@ -218,7 +269,7 @@ void ElevatorLift::Run()
 
 	if (status == UP)      //如果电梯向上运行
 	{
-		   
+
 		nowfloor += speed;    //speed为电梯每秒的运行速度
 		int temp = 0;
 		for (int i = NowFloor; i < 41; i++)
@@ -231,21 +282,21 @@ void ElevatorLift::Run()
 	{
 		nowfloor -= speed;//
 		int temp = 0;
-		for (int i = NowFloor; i >0; i--)
+		for (int i = NowFloor; i > 0; i--)
 		{
 			temp += InsideDown[i];
 		}//统计人数
 		people = temp;
 	}
-	else if(status==UPSTOP)
-	{  
+	else if (status == UPSTOP)
+	{
 		int temp = 0;
 		for (int i = NowFloor; i < 41; i++)
 		{
 			temp += InsideUp[i];
 		}//统计人数
 		people = temp;                            // 1.电梯制动
-		                                    // 2.使电梯位置与楼层地面相平
+											// 2.使电梯位置与楼层地面相平
 	}
 	else if (status == DOWNSTOP)   //向下运行
 	{
@@ -284,22 +335,237 @@ int ElevatorLift::IsTake()
 	return 0;
 }
 
-bool ElevatorLift::IsUp()
+
+
+
+
+E1::E1(int S, int K, int T, Time * tm)
 {
-	for (int i = 1; i < Max; i++)
+	status = STOP;                       //初始电梯停止
+	NowFloor = (rand() % (40 - 1)) + 1;  // 随机生成电梯停靠位置 
+	NextFloor = NowFloor;                //电梯停止时目标楼层与当前楼层一致
+	nowfloor = NowFloor;                 //用于计算的位置
+	speed = 1 / (float)S;                  //设置速度  s的单位为秒/层   speed 单位为 层/秒
+	StopTime = T;                        // 每个乘客上下电梯的时间  
+	capacity = K;                        //电梯的容量
+	people = 0;                          //当前电梯的人数
+	vacant = 0;                            //电梯空闲时间
+	busy = 0;                              //电梯运行时间
+	nowtime = tm;
+	Over = *nowtime;
+	//初始化
+	for (int i = 0; i < 41; i++)
 	{
-		if (Up[i] == true)
-			return true;
+
+		Up[i] = 0;
+		Down[i] = 0;
+		InsideUp[i] = 0;
+		InsideDown[i] = 0;
 	}
-	return false;
 }
 
-bool ElevatorLift::IsDown()
+E4::E4(int S, int K, int T, Time * tm)
 {
-	for (int i = 1; i < 41; i++)
+	status = STOP;                       //初始电梯停止
+	NowFloor = (rand() % (40 - 1)) + 1;  // 随机生成电梯停靠位置 
+	NextFloor = NowFloor;                //电梯停止时目标楼层与当前楼层一致
+	nowfloor = NowFloor;                 //用于计算的位置
+	speed = 1 / (float)S;                  //设置速度  s的单位为秒/层   speed 单位为 层/秒
+	StopTime = T;                        // 每个乘客上下电梯的时间  
+	capacity = K;                        //电梯的容量
+	people = 0;                          //当前电梯的人数
+	vacant = 0;                            //电梯空闲时间
+	busy = 0;                              //电梯运行时间
+	nowtime = tm;
+	Over = *nowtime;
+	//初始化
+	for (int i = 0; i < 41; i++)
 	{
-		if (Down[i] == true)
-			return true;
+
+		Up[i] = 0;
+		Down[i] = 0;
+		InsideUp[i] = 0;
+		InsideDown[i] = 0;
 	}
-	return false;
 }
+
+E2::E2(int S, int K, int T, Time * tm)
+{
+	status = STOP;                       //初始电梯停止
+	NowFloor = (rand() % (40 - 1)) + 1;  // 随机生成电梯停靠位置 
+	NextFloor = NowFloor;                //电梯停止时目标楼层与当前楼层一致
+	nowfloor = NowFloor;                 //用于计算的位置
+	speed = 1 / (float)S;                  //设置速度  s的单位为秒/层   speed 单位为 层/秒
+	StopTime = T;                        // 每个乘客上下电梯的时间  
+	capacity = K;                        //电梯的容量
+	people = 0;                          //当前电梯的人数
+	vacant = 0;                            //电梯空闲时间
+	busy = 0;                              //电梯运行时间
+	nowtime = tm;
+	Over = *nowtime;
+	//初始化
+	for (int i = 0; i < 41; i++)
+	{
+
+		Up[i] = 0;
+		Down[i] = 0;
+		InsideUp[i] = 0;
+		InsideDown[i] = 0;
+	}
+}
+
+E3::E3(int S, int K, int T, Time * tm)
+{
+	status = STOP;                       //初始电梯停止
+	NowFloor = (rand() % (40 - 1)) + 1;  // 随机生成电梯停靠位置 
+	NextFloor = NowFloor;                //电梯停止时目标楼层与当前楼层一致
+	nowfloor = NowFloor;                 //用于计算的位置
+	speed = 1 / (float)S;                  //设置速度  s的单位为秒/层   speed 单位为 层/秒
+	StopTime = T;                        // 每个乘客上下电梯的时间  
+	capacity = K;                        //电梯的容量
+	people = 0;                          //当前电梯的人数
+	vacant = 0;                            //电梯空闲时间
+	busy = 0;                              //电梯运行时间
+	nowtime = tm;
+	Over = *nowtime;
+	//初始化
+	for (int i = 0; i < 41; i++)
+	{
+
+		Up[i] = 0;
+		Down[i] = 0;
+		InsideUp[i] = 0;
+		InsideDown[i] = 0;
+	}
+}
+
+
+void E1::SetUp(int floor, int n)
+{
+	if ((floor <= 40 && 25 <= floor) || floor == 1)
+	{
+		Up[floor] += n;
+	}
+}
+
+void E1::SetDown(int floor, int n)
+{
+	if ((floor <= 40 && 25 <= floor) || floor == 1)
+	{
+		Down[floor] += n;
+	}
+}
+
+void E1::SetInsideUp(int floor, int n)
+{
+	if ((floor <= 40 && 25 <= floor) || floor == 1)
+	{
+		InsideUp[floor] += n;
+	}
+}
+
+void E1::SetInsideDown(int floor, int n)
+{
+	if ((floor <= 40 && 25 <= floor) || floor == 1)
+	{
+		InsideDown[floor] += n;
+	}
+}
+
+void E2::SetUp(int floor, int n)
+{
+	if (floor <= 25 && 1 <= floor)
+	{
+		Up[floor] += n;
+	}
+}
+
+void E2::SetDown(int floor, int n)
+{
+	if (floor <= 25 && 1 <= floor)
+	{
+		Down[floor] += n;
+	}
+}
+
+void E2::SetInsideUp(int floor, int n)
+{
+	if (floor <= 25 && 1 <= floor)
+	{
+		InsideUp[floor] += n;
+	}
+}
+
+void E2::SetInsideDown(int floor, int n)
+{
+	if (floor <= 25 && 1 <= floor)
+	{
+		InsideDown[floor] += n;
+	}
+}
+
+void E3::SetUp(int floor, int n)
+{
+	if (floor % 2 ==  0 || floor == 1)
+	{
+		Up[floor] += n;
+	}
+}
+
+void E3::SetDown(int floor, int n)
+{
+	if (floor % 2 == 0 || floor==1)
+	{
+		Down[floor] += n;
+	}
+}
+
+void E3::SetInsideUp(int floor, int n)
+{
+	if (floor % 2 == 0 || floor == 1)
+	{
+		InsideUp[floor] += n;
+	}
+}
+
+void E3::SetInsideDown(int floor, int n)
+{
+	if (floor % 2 == 0 || floor == 1)
+	{
+		InsideDown[floor] += n;
+	}
+}
+
+void E4::SetUp(int floor, int n)
+{
+	if (floor % 2 == 1)
+	{
+		Up[floor] += n;
+	}
+}
+
+void E4::SetDown(int floor, int n)
+{
+	if (floor % 2 == 1)
+	{
+		Down[floor] += n;
+	}
+}
+
+void E4::SetInsideUp(int floor, int n)
+{
+	if (floor % 2 == 1)
+	{
+		InsideUp[floor] += n;
+	}
+}
+
+void E4::SetInsideDown(int floor, int n)
+{
+	if (floor % 2 == 1)
+	{
+		InsideDown[floor] += n;
+	}
+}
+
+
