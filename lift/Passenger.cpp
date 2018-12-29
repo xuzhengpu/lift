@@ -19,6 +19,7 @@ Passenger::Passenger(int M, int L, ElevatorLift * E[], Time * tm)
 	{
 		e[i] = E[i];
 	}
+	Select(group, which);
 }
 
 
@@ -49,11 +50,13 @@ void Passenger::action()
 					{
 						e[which]->SetInsideUp(NextFloor, 1);   //设置目标楼层
 						e[which]->SetUp(NowFloor, -1);         //撤销呼叫
+						e[which]->people++;
 					}
 					else if ((NextFloor - NowFloor) < 0)
 					{
 						e[which]->SetInsideDown(NextFloor, 1);  //设置目标楼层
 						e[which]->SetDown(NowFloor, -1);        //撤销呼叫
+						e[which]->people++;
 					}
 					else
 					{
@@ -62,6 +65,33 @@ void Passenger::action()
 				}
 			}
 		}
+		if ((*nowtime - NextTime) % 60 == 0)
+		{
+			//如果等待时间每超过一分钟 重新选择电梯
+			//首先撤销上次的选择记录
+			int  old_which = which;
+			if ((NextFloor - NowFloor) > 0)
+			{
+
+				e[old_which]->SetUp(NowFloor, -1);   
+			}
+			else
+			{
+				e[old_which]->SetDown(NowFloor, -1);  ;
+			}
+			Select(group, which);  //如果电梯满员 重新选择电梯
+			//重新设置新的电梯记录
+			if ((NextFloor - NowFloor) > 0)
+			{
+
+				e[which]->SetUp(NowFloor, 1);    //Up[this->NowFloor] += 1;
+			}
+			else
+			{
+				e[which]->SetDown(NowFloor, 1);  //Down[this->NowFloor] += 1;
+			}
+		}
+
 		break;
 	case  TAKE:
 		NowFloor = e[which]->NowFloor;        //更新当前乘坐电梯的楼层                               
@@ -91,7 +121,7 @@ void Passenger::action()
 				NextTime = (*nowtime + ((rand() % 111) + 10));     //生成下一次乘梯时间,随机停留10-120秒
 				break;
 			}
-
+			e[which]->people--;
 
 		}
 		break;
@@ -210,6 +240,13 @@ void  Passenger::Select(int & group, int & which)
 	{
 		select[8] += 1;
 		select[9] = 1;
+	}
+	for (int i = 0; i < 10; i++)
+	{
+		if (e[i]->people >= (e[i]->capacity)*0.8)
+		{
+			select[i] = 0;
+		}
 	}
 
 	// 进一步选择

@@ -271,41 +271,41 @@ void ElevatorLift::Run()
 	{
 
 		nowfloor += speed;    //speed为电梯每秒的运行速度
-		int temp = 0;
-		for (int i = NowFloor; i < 41; i++)
-		{
-			temp += InsideUp[i];
-		}//统计人数
-		people = temp;
+		//int temp = 0;
+		//for (int i = NowFloor; i < 41; i++)
+		//{
+		//	temp += InsideUp[i];
+		//}//统计人数
+		//people = temp;
 	}
 	else if (status == DOWN)   //向下运行
 	{
 		nowfloor -= speed;//
-		int temp = 0;
-		for (int i = NowFloor; i > 0; i--)
-		{
-			temp += InsideDown[i];
-		}//统计人数
-		people = temp;
+		//int temp = 0;
+		//for (int i = NowFloor; i > 0; i--)
+		//{
+		//	temp += InsideDown[i];
+		//}//统计人数
+		//people = temp;
 	}
 	else if (status == UPSTOP)
 	{
-		int temp = 0;
-		for (int i = NowFloor; i < 41; i++)
-		{
-			temp += InsideUp[i];
-		}//统计人数
-		people = temp;                            // 1.电梯制动
+		//int temp = 0;
+		//for (int i = NowFloor; i < 41; i++)
+		//{
+		//	temp += InsideUp[i];
+		//}//统计人数
+		//people = temp;                            // 1.电梯制动
 											// 2.使电梯位置与楼层地面相平
 	}
 	else if (status == DOWNSTOP)   //向下运行
 	{
-		int temp = 0;
-		for (int i = NowFloor; i > 0; i--)
-		{
-			temp += InsideDown[i];
-		}//统计人数
-		people = temp;
+		//int temp = 0;
+		//for (int i = NowFloor; i > 0; i--)
+		//{
+		//	temp += InsideDown[i];
+		//}//统计人数
+		//people = temp;
 	}
 	else
 	{
